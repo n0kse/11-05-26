@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏗️ Реновация Москва — Чат-бот</title>
+    <style>
+        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            max-height: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== ШАПКА ===== */
+        .chat-header {
+            background: linear-gradient(135deg, #1e5b8a, #2d7abf);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        /* ===== ОБЛАСТЬ СООБЩЕНИЙ ===== */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f9fafc;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+
+        .bot .avatar {
+            background: #e3f2fd;
+        }
+
+        .user .avatar {
+            background: #1e5b8a;
+            color: white;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95em;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .bot .bubble {
+            background: white;
+            border: 1px solid #e1e4e8;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user .bubble {
+            background: #1e5b8a;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        /* ===== КНОПКИ-ПОДСКАЗКИ ===== */
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px 20px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+
+        .quick-btn {
+            background: #f0f4f8;
+            border: 1px solid #d1d9e6;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .quick-btn:hover {
+            background: #e3f2fd;
+            border-color: #1e5b8a;
+            color: #1e5b8a;
+        }
+
+        /* ===== ПОЛЕ ВВОДА ===== */
+        .chat-input-area {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            background: white;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 1px solid #d1d9e6;
+            border-radius: 25px;
+            font-size: 0.95em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #1e5b8a;
+        }
+
+        .send-btn {
+            background: #1e5b8a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background: #2d7abf;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Шапка -->
+        <div class="chat-header">
+            <h1>🏗️ Реновация Москва</h1>
+            <p>Чат-бот | Актуальная информация</p>
+        </div>
+
+        <!-- Область сообщений -->
+        <div class="chat-messages" id="chatMessages">
+            <!-- Стартовое приветствие -->
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    Привет! Я чат-бот по программе реновации в Москве. Могу рассказать:<br>
+                    • Что такое реновация?<br>
+                    • Как узнать, попадёт ли ваш дом в программу?<br>
+                    • Как проходит переселение?<br>
+                    • Какие документы нужны?<br><br>
+                    Задайте вопрос или выберите тему ниже.
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки-подсказки -->
+        <div class="quick-buttons" id="quickButtons">
+            <button class="quick-btn" onclick="sendQuick('Что такое реновация?')">Что такое реновация?</button>
+            <button class="quick-btn" onclick="sendQuick('Какие дома участвуют?')">Какие дома участвуют?</button>
+            <button class="quick-btn" onclick="sendQuick('Как получить квартиру?')">Как получить квартиру?</button>
+            <button class="quick-btn" onclick="sendQuick('Документы для переезда')">Документы для переезда</button>
+            <button class="quick-btn" onclick="sendQuick('Контакты горячей линии')">Контакты горячей линии</button>
+        </div>
+
+        <!-- Поле ввода -->
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Введите ваш вопрос..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== БАЗА ЗНАНИЙ ЧАТ-БОТА =====
+        const knowledgeBase = {
+            "что такое реновация": "Программа реновации жилищного фонда в Москве утверждена в августе 2017 года. Она предусматривает расселение более 5 тысяч домов (в основном пятиэтажек) и предоставление жителям новых квартир с готовым ремонтом в том же районе. Квартиры предоставляются бесплатно, в равнозначных по площади и количеству комнат жилых помещениях. На начало 2026 года уже построено более 168 тыс. кв. метров жилья, темпы строительства выросли вдвое.",
+            
+            "какие дома участвуют": "В программу включены многоквартирные дома (преимущественно пятиэтажки первого периода индустриального домостроения), за которые проголосовали жители. Полный список домов, переселение которых запланировано на 2025–2028 гг., можно найти в Приложении 2 к Приказу Департамента градостроительной политики г. Москвы № 45/182/ПР-335/20 (доступен на портале garant.ru). По состоянию на 2025 год программа полностью завершена в 12 районах: Раменки, Северный, Молжаниновский, Коммунарка и других.",
+            
+            "как получить квартиру": "Переселение проходит в 4 этапа: 1) Подготовка к переезду — сбор информации. 2) Осмотр новой квартиры. 3) Оформление документов. 4) Непосредственный переезд. Записаться на осмотр можно онлайн через приложение «Моя Москва» (раздел «Дом» → сервис «Реновация»). Также можно оформить электронную подпись (УКЭП) и подписывать документы дистанционно.",
+            
+            "документы для переезда": "Основные документы: паспорта всех собственников, свидетельства о собственности (или договор социального найма), справка об отсутствии задолженности по ЖКУ. Документы оформляются в центрах информирования населения (адреса уточняйте по горячей линии). Бесплатную электронную подпись (УКЭП) можно оформить в удостоверяющем центре «Электронная Москва».",
+            
+            "горячая линия": "Телефон горячей линии Общественного штаба по реновации: +7 (495) 548-20-80 (будние дни с 09:00 до 20:00). Адрес штаба: Лихов переулок, дом 3, строение 1. Электронная почта: help@str.mos.ru. Также работает горячая линия Фонда реновации: +7 (499) 401-01-01.",
+            
+            "этапы переселения": "1) Подготовка к переезду — вы получаете уведомление о том, что ваш дом включён в программу. 2) Осмотр квартиры — запись онлайн или через центр информирования. 3) Оформление документов — подписание договора (можно дистанционно с УКЭП). 4) Переезд — вам предоставляется бесплатная помощь с перевозкой вещей.",
+            
+            "можно ли отказаться": "Да, до подписания договора вы имеете право выразить несогласие. Можно добиваться исключения дома из программы, но для этого нужны коллективные действия. Рекомендуется обратиться в Общественный штаб по реновации для консультации.",
+            
+            "ремонт в новой квартире": "Квартиры предоставляются с готовым ремонтом (предчистовая отделка): стены выровнены, поклеены обои, выполнена стяжка полов, установлены сантехника, плита, окна и двери. Жильё полностью пригодно для проживания.",
+            
+            "сроки переселения": "Программа реализуется поэтапно. Точные сроки для каждого дома указаны в приложениях к Приказу № 45/182/ПР-335/20. В среднем от уведомления до фактического переезда проходит от нескольких месяцев до года. Власти Москвы поставили задачу ускорить реализацию программы вдвое.",
+            
+            "районы": "Программа охватывает все округа Москвы. Наибольшее количество расселённых домов — в ЗАО (более 130 домов), в том числе Можайский район (31 дом), Фили-Давыдково (27), Очаково-Матвеевское (22). Полностью завершена программа в 12 районах: Раменки, Северный, Южное и Северное Бутово, Ясенево и других."
+        };
+
+        // ===== ФУНКЦИИ ЧАТА =====
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+
+        // Добавление сообщения в чат
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = sender === 'bot' ? '🤖' : '👤';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = text.replace(/\n/g, '<br>');
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Поиск ответа в базе знаний
+        function findAnswer(query) {
+            const q = query.toLowerCase().trim();
+            // Прямой поиск
+            for (const [key, answer] of Object.entries(knowledgeBase)) {
+                if (q.includes(key)) {
+                    return answer;
+                }
+            }
+            // Поиск по ключевым словам
+            if (q.includes('документ') || q.includes('справк')) return knowledgeBase["документы для переезда"];
+            if (q.includes('телефон') || q.includes('позвонить') || q.includes('связь')) return knowledgeBase["горячая линия"];
+            if (q.includes('этап') || q.includes('процесс')) return knowledgeBase["этапы переселения"];
+            if (q.includes('ремонт') || q.includes('отделк')) return knowledgeBase["ремонт в новой квартире"];
+            if (q.includes('срок') || q.includes('когда')) return knowledgeBase["сроки переселения"];
+            if (q.includes('район') || q.includes('адрес')) return knowledgeBase["районы"];
+            return null;
+        }
+
+        // Стандартный ответ, если тема не распознана
+        function getFallbackAnswer() {
+            return "Извините, я не совсем понял ваш вопрос. Попробуйте спросить иначе или выберите одну из тем ниже. Также вы можете позвонить на горячую линию: +7 (495) 548-20-80 (будни, 09:00–20:00).";
+        }
+
+        // Обработка отправки сообщения
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            
+            addMessage(text, 'user');
+            chatInput.value = '';
+            
+            // Имитация задержки ответа
+            setTimeout(() => {
+                const answer = findAnswer(text) || getFallbackAnswer();
+                addMessage(answer, 'bot');
+            }, 500);
+        }
+
+        // Отправка быстрого вопроса
+        function sendQuick(question) {
+            chatInput.value = question;
+            sendMessage();
+        }
+
+        // Обработка нажатия Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Автофокус на поле ввода при загрузке
+        window.onload = () => {
+            chatInput.focus();
+        };
+    </script>
+</body>
+</html>
